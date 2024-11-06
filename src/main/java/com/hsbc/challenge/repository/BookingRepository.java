@@ -18,9 +18,20 @@ import com.hsbc.challenge.model.entities.Booking;
 public class BookingRepository {
 	private static final Logger logger = LoggerFactory.getLogger(BookingRepository.class);
 
-	private final int TIME_SLOT_SIZE = 2;
+	// Slot time in milliseconds
+	private final int TIME_SLOT_SIZE = 2 * 60 * 60000;
+	// Represents the model, the bookings are saved depending of the year, month and
+	// day
 	private Map<Integer, Map<Integer, Map<Integer, List<Booking>>>> data = new HashMap<>();
 
+	/**
+	 * Get the bookings of a soecific day
+	 * 
+	 * @param year
+	 * @param month
+	 * @param day
+	 * @return the list of bookings if exist or empty list if not
+	 */
 	public List<Booking> getAllBookings(int year, int month, int day) {
 
 		data.forEach((k, v) -> logger.debug("Key: " + k + ": Value: " + v));
@@ -33,6 +44,12 @@ public class BookingRepository {
 		return bookings;
 	}
 
+	/**
+	 * Add booking
+	 * 
+	 * @param booking
+	 * @return the booking if the value could be added or null if not
+	 */
 	public Booking addBooking(Booking booking) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(booking.getTime());
@@ -63,12 +80,14 @@ public class BookingRepository {
 		List<Booking> dayData = data.get(year).get(month).get(day);
 
 		List<Booking> fdayData = dayData.stream().sorted(Comparator.comparing(Booking::getTime)).filter(b -> {
-			Calendar calb = Calendar.getInstance();
-			calb.setTime(b.getTime());
+			long timeb = b.getTime().getTime();
 
-			int hourb = cal.get(Calendar.HOUR_OF_DAY);
-
-			return hourb != hour;
+			long time = booking.getTime().getTime();
+			
+			if(Math.abs(time -timeb) < TIME_SLOT_SIZE)
+				return true;
+			
+			return false; 
 		}).collect(Collectors.toList());
 
 		if (fdayData.isEmpty()) {

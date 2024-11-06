@@ -16,7 +16,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 
 @Path("/booking")
-@Description(value = "A human user", details = "Use this API to get and create users")
+@Description(value = "A booking", details = "Use this API to get and create bookings")
 public class BookingResource {
 	BookingService bookingService;
 
@@ -39,7 +39,7 @@ public class BookingResource {
 	@Consumes("application/json")
 	@Description("Adds a new booking")
 	@ApiResponse(code = "201", message = "The booking was added")
-	@ApiResponse(code = "400", message = "The ID or name was not specified")
+	@ApiResponse(code = "400", message = "A problem in add operation")
 	public Response add(Booking booking) {
 		Booking bookingAdded = bookingService.addBooking(booking);
 
